@@ -29,10 +29,7 @@ if not st.session_state.ip:
         height=0,
     )
 
-    # Temporary placeholder to trigger rerun when IP is received
-    ip = st.empty()
-
-    # Receive the IP via component
+    # Placeholder to trigger rerun when IP is received
     ip_component = components.html(
         """
         <script>
@@ -54,12 +51,13 @@ if not st.session_state.ip:
 else:
     st.success(f"Your IP address is: {st.session_state.ip}")
 
-# Use a hidden input to receive the value
-ip_value = st.experimental_get_query_params().get("ip_from_js", [None])[0]
+# Read query parameters using the new method
+params = st.query_params
+ip_input = params.get("ip", [None])[0]
+ip_from_js = params.get("ip_from_js", [None])[0]
 
-# Alternative way to catch JS response
-ip_input = st.experimental_get_query_params().get("ip", [None])[0]
-
-# Capture the returned IP if available
+# Use query param fallback if needed
 if ip_input and not st.session_state.ip:
     st.session_state.ip = ip_input
+elif ip_from_js and not st.session_state.ip:
+    st.session_state.ip = ip_from_js

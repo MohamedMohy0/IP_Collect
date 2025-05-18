@@ -7,7 +7,7 @@ st.title("Your Public IP Address")
 # This component fetches and displays the IP using JavaScript
 components.html(
     """
-    <div id="ipDisplay" style="font-size: 24px; color: green; font-weight: bold;">
+    <div id="ipDisplay" style="font-size: 24px; color: white; font-weight: bold;">
         Getting your IP...
     </div>
     <script>

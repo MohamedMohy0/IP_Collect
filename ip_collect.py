@@ -39,6 +39,6 @@ components.html(
 )
 
 # Use st.experimental_get_query_params as a workaround to check if IP was received
-ip = st.experimental_get_query_params().get("ip", [None])[0]
+ip = st.query_params.get("ip", [None])[0]
 if ip:
     st.success(f"Your IP address is: {ip}")

@@ -1,33 +1,27 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.markdown("### Getting your IP address...")
+st.set_page_config(page_title="Get Your IP", layout="centered")
+st.title("Your Public IP Address")
 
-# Create a hidden component to receive IP
-ip = components.html(
+# This component fetches and displays the IP using JavaScript
+components.html(
     """
+    <div id="ipDisplay" style="font-size: 24px; color: green; font-weight: bold;">
+        Getting your IP...
+    </div>
     <script>
-        const getIP = async () => {
-            const res = await fetch('https://api.ipify.org?format=json');
-            const data = await res.json();
-            const ip = data.ip;
-
-            // Send the IP back as the component value
-            const streamlitMsg = window.parent;
-            streamlitMsg.postMessage({
-                isStreamlitMessage: true,
-                type: "streamlit:setComponentValue",
-                value: ip
-            }, "*");
-        };
+        async function getIP() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                document.getElementById("ipDisplay").innerText = "Your IP address is: " + data.ip;
+            } catch (e) {
+                document.getElementById("ipDisplay").innerText = "Failed to get IP.";
+            }
+        }
         getIP();
     </script>
     """,
-    height=0,
+    height=100,
 )
-
-# Show result if received
-if ip:
-    st.success(f"Your IP address is: {ip}")
-else:
-    st.info("Still fetching your IP...")

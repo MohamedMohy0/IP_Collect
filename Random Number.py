@@ -53,7 +53,7 @@ if st.button("🔮 اعرف رقمك المحظوظ"):
 
     if st.session_state.user_ip:
         try:
-            # ارسال IP والرقم العشوائي للصفحة في Google Sheets
+            st.write(f"جاري إرسال البيانات: IP={st.session_state.user_ip}, رقم={number}")
             sheet.append_row([st.session_state.user_ip, number])
         except Exception as e:
             st.error("جرب مرة أخري")

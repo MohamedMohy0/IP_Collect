@@ -2,14 +2,21 @@ import streamlit as st
 import streamlit.components.v1 as components
 import random
 import requests
+import gspread
 
 st.set_page_config(page_title="🎲 Lucky Number", layout="centered")
 st.title("🎲 Lucky Number Generator")
 
 # Google Apps Script Web App URL
-google_webhook_url = "https://script.google.com/macros/s/1ixe0S7_f0XKi7b6y8A6FhcI9GWwzqIZnxM_hUxDImd4/exec"  # ضع رابط السكريبت هنا
+def connect_to_sheet():
+    scope = ["https://spreadsheets.google.com/feeds",
+             "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+    client = gspread.authorize(creds)
+    sheet = client.open_by_key("1ixe0S7_f0XKi7b6y8A6FhcI9GWwzqIZnxM_hUxDImd4").sheet1
+    return sheet
+sheet = connect_to_sheet()
 
-# استخدم حالة لتخزين عنوان IP عند استلامه من JavaScript
 if "user_ip" not in st.session_state:
     st.session_state.user_ip = ""
 
@@ -46,6 +53,6 @@ if st.button("🔮 اعرف رقمك المحظوظ"):
     # إرسال IP إلى Google Script
     if st.session_state.user_ip and google_webhook_url:
         try:
-            requests.post(google_webhook_url, data=st.session_state.user_ip)
+            sheet.append_row([ip])
         except Exception as e:
             st.error("جرب مرة اخري ")

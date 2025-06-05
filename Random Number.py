@@ -30,10 +30,8 @@ try:
     response = requests.get('https://api.ipify.org?format=json')
     response.raise_for_status()  # Raise an error for bad status codes
     ip = response.json()['ip']
-    return ip_address
 except Exception as e:
     print(f"Failed to get IP: {e}")
-    return None
 
 
 # عرض الـ IP بعد التقاطه

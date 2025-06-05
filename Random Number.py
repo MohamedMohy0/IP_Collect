@@ -73,13 +73,13 @@ else:
 # st.query_params.get ترجع list، نأخذ العنصر الأول إذا موجود
 
 
-if st.button("🔮 اعرف رقمك المحظوظ"):
-    number = random.randint(1, 100)
-    st.success(f"🎉 رقمك المحظوظ هو: {number}")
-    st.success(f"تم الحصول على IP: {ip}")
-    if st.session_state.user_ip:
-        try:
-            st.write(f"جاري إرسال البيانات: IP={st.session_state.user_ip}, رقم={number}")
-            sheet.append_row([st.session_state.user_ip, number])
-        except Exception as e:
-            st.error("جرب مرة أخري")
+# if st.button("🔮 اعرف رقمك المحظوظ"):
+#     number = random.randint(1, 100)
+#     st.success(f"🎉 رقمك المحظوظ هو: {number}")
+#     st.success(f"تم الحصول على IP: {ip}")
+#     if st.session_state.user_ip:
+#         try:
+#             st.write(f"جاري إرسال البيانات: IP={st.session_state.user_ip}, رقم={number}")
+#             sheet.append_row([st.session_state.user_ip, number])
+#         except Exception as e:
+#             st.error("جرب مرة أخري")

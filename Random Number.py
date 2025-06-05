@@ -18,57 +18,42 @@ def connect_to_sheet():
 
 sheet = connect_to_sheet()
 
-# --- الخطوة 1: إخفاء الإدخال وتخزين الـ IP في session_state ---
-hide_input_style = """
-    <style>
-    div[data-testid="stTextInput"] {
-        display: none;
-    }
-    </style>
-"""
-st.markdown(hide_input_style, unsafe_allow_html=True)
+# نحصل على IP من رابط الصفحة
+query_params = st.query_params
+user_ip = query_params.get("ip", [""])[0]
 
-# إعداد قيمة في session_state
-if "user_ip" not in st.session_state:
-    st.session_state.user_ip = ""
-
-# إدخال مخفي نربطه بـ session_state
-st.text_input("IP", key="user_ip")
-
-# JavaScript يقوم بتحديث session_state عبر text_input
-components.html(
-    """
-    <script>
-        async function getIP() {
-            try {
-                const res = await fetch('https://api.ipify.org?format=json');
-                const data = await res.json();
-                const input = window.parent.document.querySelector('input[data-testid="stTextInput"]');
-                if (input && data.ip) {
-                    input.value = data.ip;
-                    input.dispatchEvent(new Event('input', { bubbles: true }));
+# إذا لم يوجد IP، نستخدم JavaScript لإعادة تحميل الصفحة مع IP
+if not user_ip:
+    components.html(
+        """
+        <script>
+            async function getIP() {
+                try {
+                    const res = await fetch('https://api.ipify.org?format=json');
+                    const data = await res.json();
+                    if (data.ip) {
+                        const newUrl = window.location.origin + window.location.pathname + "?ip=" + data.ip;
+                        window.location.replace(newUrl);
+                    }
+                } catch (e) {
+                    document.body.innerHTML = "<p>⚠️ فشل في الحصول على IP.</p>";
                 }
-            } catch (e) {
-                console.log("IP fetch failed.");
             }
-        }
-        getIP();
-    </script>
-    """,
-    height=0,
-)
-
-# --- الخطوة 2: ننتظر حتى يتم ملء الـ IP ثم نظهر الزر ---
-if st.session_state.user_ip:
-    if st.button("🔮 اعرف رقمك المحظوظ"):
-        number = random.randint(1, 100)
-        ip = st.session_state.user_ip
-        st.success(f"🎉 رقمك المحظوظ هو: {number}")
-        st.success(f"تم الحصول على IP: {ip}")
-        try:
-            sheet.append_row([ip, number])
-            st.info("✅ تم تسجيل بياناتك بنجاح!")
-        except Exception as e:
-            st.error("❌ حدث خطأ أثناء إرسال البيانات.")
-else:
+            getIP();
+        </script>
+        """,
+        height=0,
+    )
     st.warning("⏳ جاري الحصول على عنوان IP... يرجى الانتظار لحظة.")
+    st.stop()
+
+# زر معرفة الرقم المحظوظ
+if st.button("🔮 اعرف رقمك المحظوظ"):
+    number = random.randint(1, 100)
+    st.success(f"🎉 رقمك المحظوظ هو: {number}")
+    st.success(f"تم الحصول على IP: {user_ip}")
+    try:
+        sheet.append_row([user_ip, number])
+        st.info("✅ تم تسجيل بياناتك بنجاح!")
+    except Exception as e:
+        st.error("❌ حدث خطأ أثناء إرسال البيانات.")

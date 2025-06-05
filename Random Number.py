@@ -21,23 +21,30 @@ sheet = connect_to_sheet()
 if "user_ip" not in st.session_state:
     st.session_state.user_ip = ""
 
-components.html(
+ip = components.html(
     """
+    <div id="ipDisplay" style="font-size: 24px; color: white; font-weight: bold;">
+        Getting your IP...
+    </div>
     <script>
-        fetch("https://api.ipify.org?format=json")
-            .then(response => response.json())
-            .then(data => {
-                const ip = data.ip;
-                const queryParams = new URLSearchParams(window.location.search);
-                queryParams.set("ip", ip);
-                const newUrl = window.location.pathname + "?" + queryParams.toString();
-                window.history.replaceState({}, "", newUrl);
-                window.parent.postMessage({isStreamlitMessage: true}, "*");
-            })
-            .catch(() => {});
+        async function getIP() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                document.getElementById("ipDisplay").innerText = "Your IP address is: " + data.ip;
+
+                // هذا السطر يرسل IP إلى بايثون
+                window.parent.postMessage({ isStreamlitMessage: true, type: 'streamlit:setComponentValue', value: data.ip }, "*");
+
+            } catch (e) {
+                document.getElementById("ipDisplay").innerText = "Failed to get IP.";
+                window.parent.postMessage({ isStreamlitMessage: true, type: 'streamlit:setComponentValue', value: null }, "*");
+            }
+        }
+        getIP();
     </script>
     """,
-    height=0
+    height=100
 )
 
 # st.query_params.get ترجع list، نأخذ العنصر الأول إذا موجود
@@ -50,7 +57,10 @@ if ip and not st.session_state.user_ip:
 if st.button("🔮 اعرف رقمك المحظوظ"):
     number = random.randint(1, 100)
     st.success(f"🎉 رقمك المحظوظ هو: {number}")
-
+    st.write(f"جاري إرسال البيانات: IP={ip}, رقم={number}")
+    sheet.append_row([ip, number])
+    st.write(f"جاري إرسال البيانات: IP={st.session_state.user_ip}, رقم={number}")
+    sheet.append_row([st.session_state.user_ip, number])
     if st.session_state.user_ip:
         try:
             st.write(f"جاري إرسال البيانات: IP={st.session_state.user_ip}, رقم={number}")

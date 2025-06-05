@@ -7,12 +7,13 @@ from oauth2client.service_account import ServiceAccountCredentials
 st.set_page_config(page_title="🎲 Lucky Number", layout="centered")
 st.title("🎲 Lucky Number Generator")
 
+@st.cache_resource
 def connect_to_sheet():
-    scope = ["https://spreadsheets.google.com/feeds",
-             "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name(st.secrets["google"], scope)
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["google"], scope)
     client = gspread.authorize(creds)
-    sheet = client.open_by_key("1ixe0S7_f0XKi7b6y8A6FhcI9GWwzqIZnxM_hUxDImd4").sheet1
+    sheet_id = "1ixe0S7_f0XKi7b6y8A6FhcI9GWwzqIZnxM_hUxDImd4"
+    sheet = client.open_by_key(sheet_id).sheet1
     return sheet
 
 sheet = connect_to_sheet()

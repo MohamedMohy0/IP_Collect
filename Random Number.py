@@ -48,15 +48,12 @@ ip = components.html(
 )
 
 # st.query_params.get ترجع list، نأخذ العنصر الأول إذا موجود
-ip_list = st.query_params.get("ip", [])
-ip = ip_list[0] if ip_list else ""
 
-if ip and not st.session_state.user_ip:
-    st.session_state.user_ip = ip
 
 if st.button("🔮 اعرف رقمك المحظوظ"):
     number = random.randint(1, 100)
     st.success(f"🎉 رقمك المحظوظ هو: {number}")
+    st.success(f"تم الحصول على IP: {ip}")
     st.write(f"جاري إرسال البيانات: IP={ip}, رقم={number}")
     sheet.append_row([ip, number])
     st.write(f"جاري إرسال البيانات: IP={st.session_state.user_ip}, رقم={number}")

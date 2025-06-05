@@ -18,35 +18,58 @@ def connect_to_sheet():
 
 sheet = connect_to_sheet()
 
-if "user_ip" not in st.session_state:
-    st.session_state.user_ip = ""
+ip_holder = st.empty()
 
-ip = components.html(
+# 2. نستخدم session_state لتخزين IP
+if "user_ip" not in st.session_state:
+    st.session_state.user_ip = None
+
+# 3. HTML + JavaScript لجلب الـ IP
+components.html(
     """
-    <div id="ipDisplay" style="font-size: 24px; color: white; font-weight: bold;">
-        Getting your IP...
-    </div>
     <script>
         async function getIP() {
             try {
                 const res = await fetch('https://api.ipify.org?format=json');
                 const data = await res.json();
-                document.getElementById("ipDisplay").innerText = "Your IP address is: " + data.ip;
 
-                // هذا السطر يرسل IP إلى بايثون
-                window.parent.postMessage({ isStreamlitMessage: true, type: 'streamlit:setComponentValue', value: data.ip }, "*");
-
+                // إرسال IP إلى Streamlit عبر postMessage
+                window.parent.postMessage(
+                    {
+                        isStreamlitMessage: true,
+                        type: 'streamlit:setComponentValue',
+                        value: data.ip
+                    },
+                    '*'
+                );
             } catch (e) {
-                document.getElementById("ipDisplay").innerText = "Failed to get IP.";
-                window.parent.postMessage({ isStreamlitMessage: true, type: 'streamlit:setComponentValue', value: null }, "*");
+                window.parent.postMessage(
+                    {
+                        isStreamlitMessage: true,
+                        type: 'streamlit:setComponentValue',
+                        value: "Failed to get IP"
+                    },
+                    '*'
+                );
             }
         }
         getIP();
     </script>
     """,
-    height=100
+    height=0
 )
 
+# 4. استقبال القيمة المُرسلة من JavaScript
+ip = ip_holder.text_input("Your IP (Hidden field)", value="", label_visibility="collapsed")
+
+if ip and not st.session_state.user_ip and "Failed" not in ip:
+    st.session_state.user_ip = ip
+
+# 5. عرض النتيجة
+if st.session_state.user_ip:
+    st.success(f"✅ تم الحصول على IP: {st.session_state.user_ip}")
+else:
+    st.info("👀 جاري الحصول على عنوان الـ IP ...")
 # st.query_params.get ترجع list، نأخذ العنصر الأول إذا موجود
 
 

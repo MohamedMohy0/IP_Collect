@@ -18,49 +18,43 @@ def connect_to_sheet():
 
 sheet = connect_to_sheet()
 
-ip=components.html(
+# 1. عنصر لإدخال الـ IP عبر JavaScript
+ip_input = st.empty()
 
+components.html(
     """
-
-    </div>
-
     <script>
-
         async function getIP() {
-
             try {
-
                 const res = await fetch('https://api.ipify.org?format=json');
-
                 const data = await res.json();
-
-                document.getElementById("ipDisplay").innerText = "Your IP address is: " + data.ip;
-
+                const streamlitInput = window.parent.document.querySelector('input[data-testid="stTextInput"]');
+                if (streamlitInput) {
+                    streamlitInput.value = data.ip;
+                    streamlitInput.dispatchEvent(new Event('input', { bubbles: true }));
+                }
             } catch (e) {
-
-                document.getElementById("ipDisplay").innerText = "Failed to get IP.";
-
-            }More actions
-
+                console.log("IP fetch failed.");
+            }
         }
-
         getIP();
-
     </script>
-
     """,
-
-    height=100,
-
+    height=0,
 )
 
+user_ip = ip_input.text_input("IP Address", value="", label_visibility="collapsed")
+
+# 2. توليد الرقم المحظوظ وتخزينه في Google Sheet
 if st.button("🔮 اعرف رقمك المحظوظ"):
-    number = random.randint(1, 100)
-    st.success(f"🎉 رقمك المحظوظ هو: {number}")
-    st.success(f"تم الحصول على IP: {ip}")
-    if st.session_state.user_ip:
+    if user_ip:
+        number = random.randint(1, 100)
+        st.success(f"🎉 رقمك المحظوظ هو: {number}")
+        st.success(f"تم الحصول على IP: {user_ip}")
         try:
-            st.write(f"جاري إرسال البيانات: IP={st.session_state.user_ip}, رقم={number}")
-            sheet.append_row([st.session_state.user_ip, number])
+            sheet.append_row([user_ip, number])
+            st.info("✅ تم تسجيل بياناتك بنجاح!")
         except Exception as e:
-            st.error("جرب مرة أخري")
+            st.error("❌ حدث خطأ أثناء إرسال البيانات.")
+    else:
+        st.warning("⛔ لم يتم الحصول على عنوان IP بعد. حاول مرة أخرى بعد ثوانٍ.")

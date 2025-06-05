@@ -3,7 +3,7 @@ import streamlit.components.v1 as components
 import random
 import requests
 import gspread
-
+from oauth2client.service_account import ServiceAccountCredentials
 st.set_page_config(page_title="🎲 Lucky Number", layout="centered")
 st.title("🎲 Lucky Number Generator")
 

@@ -21,7 +21,6 @@ def get_ip():
 
 # Get IP and display
 ip = get_ip()
-st.success(f"✅ تم التقاط عنوان IP: {ip}")
 
 # ---- Google Sheets Connection ----
 @st.cache_resource
@@ -39,12 +38,7 @@ if st.button("🔮 اعرف رقمك المحظوظ"):
     if 'number_generated' not in st.session_state:  # Prevent multiple submissions
         number = random.randint(1, 100)
         st.success(f"🎉 رقمك المحظوظ هو: {number}")
+        sheet.append_row([ip, number])
+        st.session_state.number_generated = True  # Mark as submitted
+            
         
-        try:
-            sheet.append_row([ip, number])
-            st.info("✅ تم تسجيل بياناتك بنجاح!")
-            st.session_state.number_generated = True  # Mark as submitted
-        except Exception as e:
-            st.error(f"❌ حدث خطأ أثناء إرسال البيانات: {e}")
-    else:
-        st.warning("⚠️ لقد حصلت بالفعل على رقمك المحظوظ!")

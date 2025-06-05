@@ -13,7 +13,7 @@ def connect_to_sheet():
     creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["google"], scope)
     client = gspread.authorize(creds)
     sheet_id = "1ixe0S7_f0XKi7b6y8A6FhcI9GWwzqIZnxM_hUxDImd4"
-    sheet = client.open_by_key(sheet_id).ip
+    sheet = client.open_by_key(sheet_id).sheet1
     return sheet
 
 sheet = connect_to_sheet()

@@ -34,7 +34,7 @@ components.html(
 )
 
 # قراءة IP من عنوان الصفحة
-ip = st.experimental_get_query_params().get("ip", [""])[0]
+ip = st.query_params.get("ip", "")
 if ip and not st.session_state.user_ip:
     st.session_state.user_ip = ip
 

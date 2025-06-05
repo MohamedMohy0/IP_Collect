@@ -55,8 +55,7 @@ if not user_ip:
         """,
         height=100,
     )
-    st.warning("⏳ جاري الحصول على عنوان IP... يرجى الانتظار لحظة.")
-    st.stop()
+
 
 # عرض الـ IP بعد التقاطه
 st.success(f"✅ تم التقاط عنوان IP: {user_ip}")

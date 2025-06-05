@@ -10,7 +10,7 @@ st.title("🎲 Lucky Number Generator")
 def connect_to_sheet():
     scope = ["https://spreadsheets.google.com/feeds",
              "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+    creds = ServiceAccountCredentials.from_json_keyfile_name(st.secrets["google"], scope)
     client = gspread.authorize(creds)
     sheet = client.open_by_key("1ixe0S7_f0XKi7b6y8A6FhcI9GWwzqIZnxM_hUxDImd4").sheet1
     return sheet

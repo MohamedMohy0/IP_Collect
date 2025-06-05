@@ -18,7 +18,7 @@ def connect_to_sheet():
 
 sheet = connect_to_sheet()
 
-# إخفاء عنصر الإدخال تماماً عبر CSS
+# --- الخطوة 1: إخفاء الإدخال وتخزين الـ IP في session_state ---
 hide_input_style = """
     <style>
     div[data-testid="stTextInput"] {
@@ -28,10 +28,14 @@ hide_input_style = """
 """
 st.markdown(hide_input_style, unsafe_allow_html=True)
 
-# عنصر إدخال غير ظاهر للـ IP
-user_ip = st.text_input("IP", key="user_ip")
+# إعداد قيمة في session_state
+if "user_ip" not in st.session_state:
+    st.session_state.user_ip = ""
 
-# JavaScript لإدخال الـ IP تلقائيًا في العنصر المخفي
+# إدخال مخفي نربطه بـ session_state
+st.text_input("IP", key="user_ip")
+
+# JavaScript يقوم بتحديث session_state عبر text_input
 components.html(
     """
     <script>
@@ -40,7 +44,7 @@ components.html(
                 const res = await fetch('https://api.ipify.org?format=json');
                 const data = await res.json();
                 const input = window.parent.document.querySelector('input[data-testid="stTextInput"]');
-                if (input) {
+                if (input && data.ip) {
                     input.value = data.ip;
                     input.dispatchEvent(new Event('input', { bubbles: true }));
                 }
@@ -54,16 +58,17 @@ components.html(
     height=0,
 )
 
-# زر الرقم المحظوظ
-if st.button("🔮 اعرف رقمك المحظوظ"):
-    if user_ip:
+# --- الخطوة 2: ننتظر حتى يتم ملء الـ IP ثم نظهر الزر ---
+if st.session_state.user_ip:
+    if st.button("🔮 اعرف رقمك المحظوظ"):
         number = random.randint(1, 100)
+        ip = st.session_state.user_ip
         st.success(f"🎉 رقمك المحظوظ هو: {number}")
-        st.success(f"تم الحصول على IP: {user_ip}")
+        st.success(f"تم الحصول على IP: {ip}")
         try:
-            sheet.append_row([user_ip, number])
+            sheet.append_row([ip, number])
             st.info("✅ تم تسجيل بياناتك بنجاح!")
         except Exception as e:
             st.error("❌ حدث خطأ أثناء إرسال البيانات.")
-    else:
-        st.warning("⛔ لم يتم الحصول على عنوان IP بعد. انتظر ثانية أو اثنتين ثم اضغط مجددًا.")
+else:
+    st.warning("⏳ جاري الحصول على عنوان IP... يرجى الانتظار لحظة.")

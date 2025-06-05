@@ -7,9 +7,7 @@ import requests
 
 
 
-# Store the IP in a variable
-my_ip = get_ip()
-print("My IP:", my_ip)
+
 # إعداد صفحة Streamlit
 st.set_page_config(page_title="🎲 Lucky Number", layout="centered")
 st.title("🎲 Lucky Number Generator")

@@ -18,68 +18,57 @@ def connect_to_sheet():
 
 sheet = connect_to_sheet()
 
-ip_holder = st.empty()
+ip=components.html(
 
-# 2. نستخدم session_state لتخزين IP
-if "user_ip" not in st.session_state:
-    st.session_state.user_ip = None
-
-# 3. HTML + JavaScript لجلب الـ IP
-components.html(
     """
+
+
+    <div id="ipDisplay" style="font-size: 24px; color: green; font-weight: bold;">
+
+
+    <div id="ipDisplay" style="font-size: 24px; color: white; font-weight: bold;">
+
+        Getting your IP...
+
+    </div>
+
     <script>
+
         async function getIP() {
+
             try {
+
                 const res = await fetch('https://api.ipify.org?format=json');
+
                 const data = await res.json();
 
-                // إرسال IP إلى Streamlit عبر postMessage
-                window.parent.postMessage(
-                    {
-                        isStreamlitMessage: true,
-                        type: 'streamlit:setComponentValue',
-                        value: data.ip
-                    },
-                    '*'
-                );
+                document.getElementById("ipDisplay").innerText = "Your IP address is: " + data.ip;
+
             } catch (e) {
-                window.parent.postMessage(
-                    {
-                        isStreamlitMessage: true,
-                        type: 'streamlit:setComponentValue',
-                        value: "Failed to get IP"
-                    },
-                    '*'
-                );
-            }
+
+                document.getElementById("ipDisplay").innerText = "Failed to get IP.";
+
+            }More actions
+
         }
+
         getIP();
+
     </script>
+
     """,
-    height=0
+
+    height=100,
+
 )
 
-# 4. استقبال القيمة المُرسلة من JavaScript
-ip = ip_holder.text_input("Your IP (Hidden field)", value="", label_visibility="collapsed")
-
-if ip and not st.session_state.user_ip and "Failed" not in ip:
-    st.session_state.user_ip = ip
-
-# 5. عرض النتيجة
-if st.session_state.user_ip:
-    st.success(f"✅ تم الحصول على IP: {st.session_state.user_ip}")
-else:
-    st.info("👀 جاري الحصول على عنوان الـ IP ...")
-# st.query_params.get ترجع list، نأخذ العنصر الأول إذا موجود
-
-
-# if st.button("🔮 اعرف رقمك المحظوظ"):
-#     number = random.randint(1, 100)
-#     st.success(f"🎉 رقمك المحظوظ هو: {number}")
-#     st.success(f"تم الحصول على IP: {ip}")
-#     if st.session_state.user_ip:
-#         try:
-#             st.write(f"جاري إرسال البيانات: IP={st.session_state.user_ip}, رقم={number}")
-#             sheet.append_row([st.session_state.user_ip, number])
-#         except Exception as e:
-#             st.error("جرب مرة أخري")
+if st.button("🔮 اعرف رقمك المحظوظ"):
+    number = random.randint(1, 100)
+    st.success(f"🎉 رقمك المحظوظ هو: {number}")
+    st.success(f"تم الحصول على IP: {ip.data.ip}")
+    if st.session_state.user_ip:
+        try:
+            st.write(f"جاري إرسال البيانات: IP={st.session_state.user_ip}, رقم={number}")
+            sheet.append_row([st.session_state.user_ip, number])
+        except Exception as e:
+            st.error("جرب مرة أخري")

@@ -54,10 +54,6 @@ if st.button("🔮 اعرف رقمك المحظوظ"):
     number = random.randint(1, 100)
     st.success(f"🎉 رقمك المحظوظ هو: {number}")
     st.success(f"تم الحصول على IP: {ip}")
-    st.write(f"جاري إرسال البيانات: IP={ip}, رقم={number}")
-    sheet.append_row([ip, number])
-    st.write(f"جاري إرسال البيانات: IP={st.session_state.user_ip}, رقم={number}")
-    sheet.append_row([st.session_state.user_ip, number])
     if st.session_state.user_ip:
         try:
             st.write(f"جاري إرسال البيانات: IP={st.session_state.user_ip}, رقم={number}")
